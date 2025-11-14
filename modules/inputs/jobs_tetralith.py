@@ -174,7 +174,7 @@ done
     print(f"Script for job file '{filename}' created successfully.")
 
 
-def write_serial_sbatch(path,ratios, volumes, ks, job_name, prcs=1, time="00:30:00", account="naiss2025-1-38", id_name="fept"):
+def write_serial_sbatch(path,ratios, volumes, ks, perc, job_name, prcs=1, time="00:30:00", account="naiss2025-1-38", id_name="fept"):
     """Write serial SBATCH script for volume optimization."""
     
         # Format numbers to 2 decimal places
@@ -187,7 +187,7 @@ def write_serial_sbatch(path,ratios, volumes, ks, job_name, prcs=1, time="00:30:
 #SBATCH --exclusive
 #SBATCH -n {prcs}
 #SBATCH -t {time}
-#SBATCH -J {job_name}
+#SBATCH -J {job_name}_p{perc}
 
 id_name="{id_name}"
 

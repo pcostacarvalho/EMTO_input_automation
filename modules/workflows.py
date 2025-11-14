@@ -254,6 +254,7 @@ def create_emto_inputs(
                 ratios=ca_ratios,
                 volumes=sws_values,
                 ks=ks,
+                perc=perc,
                 job_name=script_name,
                 prcs=prcs,
                 time=time,
