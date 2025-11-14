@@ -23,6 +23,7 @@ def create_kstr_input(path, id_name, DMAX, LAT, NL, NQ3,
     lattice_positions : list[list[float]]
         List of atomic positions.
     """
+    C = np.round(C, 7)
 
     template = f"""KSTR      HP......=N                               xx xxx xx
 JOBNAM...={id_name:<10} MSGL.=  1 MODE...=B STORE..=Y HIGH...=Y
@@ -37,7 +38,7 @@ A........= {A:>.7f} B.......= {B:>.7f} C.......= {C:>.7f}
 
     # Add lattice vectors
     for vec in lattice_vectors:
-        template += f"{vec[0]:.8f}\t{vec[1]:.8f}\t{vec[2]:.8f}\n"
+        template += f"{vec[0]:.8f}\t{vec[1]:.8f}\t{np.round(vec[2], 7):.8f}\n"
 
     # Add lattice positions
     for pos in lattice_positions:

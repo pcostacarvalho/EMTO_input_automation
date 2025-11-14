@@ -5,7 +5,9 @@ import os
 from modules.inputs import (
     create_kstr_input,
     create_shape_input,
-    create_kgrn_input,
+    create_kgrn_input_fm,
+    create_kgrn_input_afm,
+    create_kgrn_input_pm,
     create_kfcd_input
 )
 

@@ -88,8 +88,7 @@ cd ../
 def create_job_volume(
     name,
     filename,
-    volumes
-):
+    volumes):
     """
     Create a KFCD input file for EMTO.
 
@@ -142,7 +141,7 @@ cd ../
 for i in {volumes}; do
 
     echo "Running KGRN:"
-    mpirun -n 1  kgrn_mpi.x < {name}_$i.dat > kgrn_$i.log
+    mpirun -n 1  kgrn_mpi.x < {name}_${{i}}.dat > kgrn_${{i}}.log
 
     if [ $? -ne 0 ]; then
         echo "KGRN failed!"
@@ -154,7 +153,7 @@ for i in {volumes}; do
     cd fcd/ 
 
     echo "Running KFCD:"
-    kfcd.exe < {name}_$i.dat > kfcd_$i.log
+    kfcd.exe < {name}_${{i}}.dat > kfcd_${{i}}.log
 
     if [ $? -ne 0 ]; then
         echo "KGRN failed!"
@@ -164,7 +163,7 @@ for i in {volumes}; do
     fi
 
     cd ../
-    
+
 done
 
 """
@@ -175,12 +174,13 @@ done
     print(f"Script for job file '{filename}' created successfully.")
 
 
-def write_serial_sbatch(path,ratios, volumes, job_name, prcs=1, time="00:30:00", account="naiss2025-1-38", id_name="fept"):
+def write_serial_sbatch(path,ratios, volumes, ks, job_name, prcs=1, time="00:30:00", account="naiss2025-1-38", id_name="fept"):
     """Write serial SBATCH script for volume optimization."""
     
         # Format numbers to 2 decimal places
     ratios_str = ' '.join(f"{r:.2f}" for r in ratios)
     volumes_str = ' '.join(f"{v:.2f}" for v in volumes)
+    ks_str = ' '.join(str(k) for k in ks)
 
     script = f"""#! /bin/bash -l
 #SBATCH -A {account}
@@ -228,30 +228,34 @@ for r in {ratios_str}; do
 
         echo "WSW: $v"
 
-        echo "Running KGRN:"
-        mpirun -n {prcs}  kgrn_mpi.x < {id_name}_${{r}}_${{v}}.dat > kgrn_${{r}}_${{v}}.log
+        for k in {ks_str}; do
 
-        if [ $? -ne 0 ]; then
-            echo "KGRN failed!"
-            exit 1
-        else
-            echo "DONE!"
-        fi
+            echo "k-point grid: ${{k}}x${{k}}x${{k}}"
 
-        cd fcd/ 
+            echo "Running KGRN:"
+            mpirun -n {prcs}  kgrn_mpi.x < {id_name}_${{r}}_${{v}}_k${{k}}.dat > kgrn_${{r}}_${{v}}_k${{k}}.log
 
-        echo "Running KFCD:"
-        kfcd.exe < {id_name}_${{r}}_${{v}}.dat > kfcd_${{r}}_${{v}}.log
+            if [ $? -ne 0 ]; then
+                echo "KGRN failed!"
+                exit 1
+            else
+                echo "DONE!"
+            fi
 
-        if [ $? -ne 0 ]; then
-            echo "KFCD failed!"
-            exit 1
-        else
-            echo "DONE!"
-        fi
+            cd fcd/ 
 
-        cd ../
-        
+            echo "Running KFCD:"
+            kfcd.exe < {id_name}_${{r}}_${{v}}_k${{k}}.dat > kfcd_${{r}}_${{v}}_k${{k}}.log
+
+            if [ $? -ne 0 ]; then
+                echo "KFCD failed!"
+                exit 1
+            else
+                echo "DONE!"
+            fi
+
+            cd ../
+        done
     done
 
 done

@@ -1,10 +1,13 @@
+from modules.inputs.kgrn import create_kgrn_input_pm
 import numpy as np
 import os
 from modules.inputs import (
     create_kstr_input,
     create_kstr_input_from_cif,
     create_shape_input,
-    create_kgrn_input,
+    create_kgrn_input_fm,
+    create_kgrn_input_afm,
+    create_kgrn_input_pm,
     create_kfcd_input,
     write_serial_sbatch,
     write_parallel_sbatch
@@ -18,6 +21,9 @@ def create_emto_inputs(
     lat,
     ca_ratios,
     sws_values,
+    ks,
+    magn_type = 'fm',
+    perc = 0.5,
     from_cif=False,
     cif_file=None,
     nl=None,
@@ -196,22 +202,47 @@ def create_emto_inputs(
         
         # ==================== SWEEP OVER SWS VALUES ====================
         for sws in sws_values:
-            file_id_full = f"{file_id_ratio}_{sws:.2f}"
+
+            for k in ks:
+
+                file_id_full = f"{file_id_ratio}_{sws:.2f}_k{k}"
             
-            # Create KGRN input
-            create_kgrn_input(
-                path=output_path,
-                id_namev=file_id_full,
-                id_namer=file_id_ratio,
-                SWS=sws
-            )
-            
-            # Create KFCD input
-            create_kfcd_input(
-                path=output_path,
-                id_namer=file_id_ratio,
-                id_namev=file_id_full
-            )
+                # Create KGRN input
+
+                if magn_type == 'fm':
+                    create_kgrn_input_fm(
+                        path=output_path,
+                        id_namev=file_id_full,
+                        id_namer=file_id_ratio,
+                        SWS=sws,
+                        k=k
+                    )
+                elif magn_type == 'pm':
+                    create_kgrn_input_pm(
+                        path=output_path,
+                        id_namev=file_id_full,
+                        id_namer=file_id_ratio,
+                        SWS=sws,
+                        k=k,
+                        PERC=perc
+                    )
+                elif magn_type == 'afm':
+                    create_kgrn_input_afm(
+                        path=output_path,
+                        id_namev=file_id_full,
+                        id_namer=file_id_ratio,
+                        SWS=sws,
+                        k=k
+                    )
+                else:
+                    raise ValueError(f"Unsupported magn_type: {magn_type}")
+                
+                # Create KFCD input
+                create_kfcd_input(
+                    path=output_path,
+                    id_namer=file_id_ratio,
+                    id_namev=file_id_full
+                )
     # ==================== CREATE JOB SCRIPTS ====================
     if create_job_script:
         print(f"\nCreating {job_mode} job script...")
@@ -222,6 +253,7 @@ def create_emto_inputs(
                 path=output_path,
                 ratios=ca_ratios,
                 volumes=sws_values,
+                ks=ks,
                 job_name=script_name,
                 prcs=prcs,
                 time=time,
