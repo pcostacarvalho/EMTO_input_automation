@@ -7,6 +7,7 @@ from modules.inputs import (
     create_shape_input,
     create_kgrn_input_fm,
     create_kgrn_input_afm,
+    create_kgrn_input_afm_dlm,
     create_kgrn_input_pm,
     create_kfcd_input,
     write_serial_sbatch,
@@ -233,6 +234,15 @@ def create_emto_inputs(
                         id_namer=file_id_ratio,
                         SWS=sws,
                         k=k
+                    )
+                elif magn_type == 'afm-dlm':
+                    create_kgrn_input_afm_dlm(
+                        path=output_path,
+                        id_namev=file_id_full,
+                        id_namer=file_id_ratio,
+                        SWS=sws,
+                        k=k,
+                        PERC=perc
                     )
                 else:
                     raise ValueError(f"Unsupported magn_type: {magn_type}")
