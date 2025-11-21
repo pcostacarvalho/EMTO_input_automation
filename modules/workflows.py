@@ -17,12 +17,13 @@ from modules.inputs import (
 
 def create_emto_inputs(
     output_path,
-    job_name,
+    id_name,
     dmax,
     lat,
     ca_ratios,
     sws_values,
     ks,
+    job_name,
     magn_type = 'fm',
     perc = 0.5,
     from_cif=False,
@@ -135,7 +136,7 @@ def create_emto_inputs(
     for ratio in ca_ratios:
         print(f"\n  c/a = {ratio:.2f}")
         
-        file_id_ratio = f"{job_name}_{ratio:.2f}"
+        file_id_ratio = f"{id_name}_{ratio:.2f}"
         
         # ==================== MODE 1: FROM CIF ====================
         if from_cif:
@@ -143,7 +144,7 @@ def create_emto_inputs(
             info = create_kstr_input_from_cif(
                 cif_file=cif_file,
                 output_path=output_path,
-                job_name=file_id_ratio,
+                id_name=file_id_ratio,
                 dmax=dmax,
                 lat=lat,
                 nl=nl
@@ -258,36 +259,35 @@ def create_emto_inputs(
         print(f"\nCreating {job_mode} job script...")
         
         if job_mode == 'serial':
-            script_name = f"run_{job_name}"
+            # script_name = f"run_{id_name}"
             write_serial_sbatch(
                 path=output_path,
                 ratios=ca_ratios,
                 volumes=sws_values,
                 ks=ks,
-                perc=perc,
-                job_name=script_name,
+                job_name=job_name,
                 prcs=prcs,
                 time=time,
                 account=account,
-                id_name=job_name
+                id_name=id_name
             )
-            print(f"Created serial job script: {output_path}/{script_name}.sh")
-            print(f"To submit: sbatch {script_name}.sh")
+            print(f"Created serial job script: {output_path}/{job_name}.sh")
+            print(f"To submit: sbatch {job_name}.sh")
         
         elif job_mode == 'parallel':
-            script_name = f"run_{job_name}"
+            # script_name = f"run_{job_name}"
             write_parallel_sbatch(
                 path=output_path,
                 ratios=ca_ratios,
                 volumes=sws_values,
-                job_name=script_name,
+                job_name=job_name,
                 prcs=prcs,
                 time=time,
                 account=account,
-                id_name=job_name
+                id_name=id_name
             )
             print(f"Created parallel job scripts in: {output_path}/")
-            print(f"To submit: bash {output_path}/submit_{script_name}.sh")
+            print(f"To submit: bash {output_path}/submit_{job_name}.sh")
 
 
     # ==================== SUMMARY ====================

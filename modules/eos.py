@@ -97,14 +97,14 @@ def compute_equation_of_state(volumes, energies, eos_type='polynomial', order=2)
         
         return v_eq, E_eq, eos_fit, fit_func
     
-def parse_energies(ratios, sws, path, id_name):
+def parse_energies(ratios, sws, path, k, id_name):
     energies_lda = {v: [] for v in sws}
     energies_gga = {v: [] for v in sws}
     
     for r in ratios:
         for v in sws:
             try:
-                out = read_file(f"{path}/fcd/{id_name}_{r:.2f}_{v:.2f}.prn")
+                out = read_file(f"{path}/fcd/{id_name}_{r:.2f}_{v:.2f}_k{k}.prn")
                 
                 lda_found = False
                 gga_found = False

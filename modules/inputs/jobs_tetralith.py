@@ -174,7 +174,7 @@ done
     print(f"Script for job file '{filename}' created successfully.")
 
 
-def write_serial_sbatch(path,ratios, volumes, ks, perc, job_name, prcs=1, time="00:30:00", account="naiss2025-1-38", id_name="fept"):
+def write_serial_sbatch(path,ratios, volumes, ks, job_name, prcs=1, time="00:30:00", account="naiss2025-1-38", id_name="fept"):
     """Write serial SBATCH script for volume optimization."""
     
         # Format numbers to 2 decimal places
@@ -187,7 +187,7 @@ def write_serial_sbatch(path,ratios, volumes, ks, perc, job_name, prcs=1, time="
 #SBATCH --exclusive
 #SBATCH -n {prcs}
 #SBATCH -t {time}
-#SBATCH -J {job_name}_p{perc}
+#SBATCH -J {job_name}
 
 id_name="{id_name}"
 
@@ -278,7 +278,7 @@ def write_parallel_sbatch(path, ratios, volumes, job_name, prcs=1, time="00:30:0
 #SBATCH --exclusive
 #SBATCH -n {prcs}
 #SBATCH -t {time}
-#SBATCH -J {job_name}_prep_r{r_fmt}
+#SBATCH -J {job_name}_r{r_fmt}
 
 id_name="{id_name}"
 r={r_fmt}
@@ -313,7 +313,7 @@ fi
 cd ../
 """
         
-        with open(f"{path}/{job_name}_prep_r{r_fmt}.sh", "w") as f:
+        with open(f"{path}/{job_name}_r{r_fmt}.sh", "w") as f:
             f.write(script)
     
     # Stage 2: KGRN and KFCD (one per r,v pair, depends on Stage 1)
